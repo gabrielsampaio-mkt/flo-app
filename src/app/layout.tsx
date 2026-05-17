@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Fredoka } from "next/font/google";
+import { QueryProvider } from "@/providers/query-provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -36,7 +37,9 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${inter.variable} ${fredoka.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+          <QueryProvider>{children}</QueryProvider>
+        </body>
     </html>
   );
 }
