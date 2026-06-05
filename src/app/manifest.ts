@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Flô',
     short_name: 'Flô',
-    description: 'Seu cultivo. Sua jornada. Sua comunidade.',
+    description: 'Seu cultivo. Sua jornada. Nossa comunidade.',
     start_url: '/',
     display: 'standalone',
     background_color: '#0d1a0d',

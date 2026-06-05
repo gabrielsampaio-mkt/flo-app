@@ -15,8 +15,14 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Flô — Seu cultivo. Sua jornada. Sua comunidade.",
-  description: "Plataforma de acompanhamento de cultivos de cannabis para o cultivador brasileiro.",
+  title: "Flô — Seu cultivo. Sua jornada. Nossa comunidade.",
+  description: "Diário de cultivo inteligente, comunidade anônima e badge Flô #1 para membros fundadores. Feito para o cultivador brasileiro.",
+  openGraph: {
+    title: "Flô — Seu cultivo. Sua jornada. Nossa comunidade.",
+    description: "O diário do seu grow, do dia 1 à colheita. Grátis, privado e feito para o cultivador brasileiro.",
+    locale: "pt_BR",
+    type: "website",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
