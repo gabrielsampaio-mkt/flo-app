@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { format, differenceInWeeks, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { AvancarFaseButton } from './AvancarFaseButton'
+import { TogglePublicoButton } from './TogglePublicoButton'
+import { AppShell } from '@/components/AppShell'
 
 const FASE_LABEL: Record<string, string> = {
   germinacao: 'Germinação',
@@ -87,6 +89,7 @@ export default async function CultivoPage({ params }: { params: Promise<{ id: st
   const geneticaNome = cultivo.genetica === 'Outra' ? cultivo.genetica_custom : cultivo.genetica
 
   return (
+    <AppShell>
     <div className="min-h-screen bg-[#0d1a0d] px-4 py-8 max-w-lg mx-auto pb-24">
       <div className="flex items-center gap-3 mb-6">
         <Link href="/dashboard" className="text-[#8fac8f] hover:text-[#e8f0e8] transition-colors">
@@ -133,7 +136,7 @@ export default async function CultivoPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Botões de ação */}
-      <div className="flex gap-3 mb-8">
+      <div className="flex gap-3 mb-4">
         <Link
           href={`/cultivo/${id}/registro`}
           className="flex-1 py-3 rounded-2xl bg-[#4a7c4e] text-[#e8f0e8] text-sm font-medium text-center hover:bg-[#6aab6f] transition-colors"
@@ -148,6 +151,10 @@ export default async function CultivoPage({ params }: { params: Promise<{ id: st
             proximaFaseLabel={FASE_LABEL[proximaFase]}
           />
         )}
+      </div>
+
+      <div className="mb-8">
+        <TogglePublicoButton cultivoId={id} publico={cultivo.publico ?? false} />
       </div>
 
       {/* Linha do tempo */}
@@ -231,5 +238,6 @@ export default async function CultivoPage({ params }: { params: Promise<{ id: st
         ))}
       </div>
     </div>
+    </AppShell>
   )
 }

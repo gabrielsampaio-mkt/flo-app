@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { differenceInWeeks, parseISO } from 'date-fns'
+import { AppShell } from '@/components/AppShell'
 
 const FASE_LABEL: Record<string, string> = {
   germinacao: 'Germinação',
@@ -31,7 +32,8 @@ export default async function DashboardPage() {
   const concluidos = cultivos?.filter(c => c.concluido) ?? []
 
   return (
-    <div className="min-h-screen bg-[#0d1a0d] px-4 py-8 max-w-lg mx-auto">
+    <AppShell>
+    <div className="min-h-screen bg-[#0d1a0d] px-4 py-8 max-w-lg mx-auto pb-24">
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-display text-2xl font-bold text-[#e8f0e8]">Meus Cultivos</h1>
         <Link
@@ -115,5 +117,6 @@ export default async function DashboardPage() {
         </section>
       )}
     </div>
+    </AppShell>
   )
 }
