@@ -1,3 +1,5 @@
+export const FUNDADOR_LIMITE = 150
+
 export const FASE_LABEL: Record<string, string> = {
   germinacao: 'Germinação',
   muda: 'Muda',

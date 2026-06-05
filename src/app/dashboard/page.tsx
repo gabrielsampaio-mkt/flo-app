@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { differenceInWeeks, parseISO } from 'date-fns'
 import { AppShell } from '@/components/AppShell'
+import { PwaInstallGuide } from '@/components/PwaInstallGuide'
+import { formatMembroNumero } from '@/lib/constants'
 
 const FASE_LABEL: Record<string, string> = {
   germinacao: 'Germinação',
@@ -22,6 +24,12 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/auth/login')
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('username, membro_numero, is_fundador, ciclo_completo')
+    .eq('id', user.id)
+    .single()
+
   const { data: cultivos } = await supabase
     .from('cultivos')
     .select('id, nome, genetica, genetica_custom, fase_atual, data_inicio, metodo, concluido')
@@ -34,6 +42,25 @@ export default async function DashboardPage() {
   return (
     <AppShell>
     <div className="min-h-screen bg-[#0d1a0d] px-4 py-8 max-w-lg mx-auto pb-24">
+      {profile?.membro_numero && (
+        <div className="bg-[#1f351f] border border-[#2d4a2d] rounded-xl p-4 mb-6">
+          <p className="text-[#e8f0e8] text-sm font-medium">
+            Olá, @{profile.username}!
+          </p>
+          <p className="text-[#6aab6f] text-xs mt-1">
+            {formatMembroNumero(profile.membro_numero)}
+            {profile.is_fundador && !profile.ciclo_completo && (
+              <span className="text-[#8fac8f]"> — em busca do badge Flô #1</span>
+            )}
+            {profile.ciclo_completo && (
+              <span className="text-[#6aab6f]"> — 🏆 Badge Flô #1 desbloqueado!</span>
+            )}
+          </p>
+        </div>
+      )}
+
+      <PwaInstallGuide />
+
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-display text-2xl font-bold text-[#e8f0e8]">Meus Cultivos</h1>
         <Link

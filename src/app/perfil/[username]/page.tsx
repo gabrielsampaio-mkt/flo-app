@@ -67,10 +67,20 @@ export default async function PerfilPublicoPage({
             </p>
           )}
 
-          {(profile.ciclo_completo || profile.is_fundador) && (
+          {profile.ciclo_completo && (
             <span className="inline-block mt-2 text-xs bg-[#4a7c4e] text-[#e8f0e8] px-3 py-1 rounded-full font-medium">
-              🏆 Flô #1
+              🏆 Badge Flô #1
             </span>
+          )}
+
+          {!profile.ciclo_completo && totalGrows > 0 && (
+            <span className="inline-block mt-2 text-xs bg-[#1a2e1a] border border-[#2d4a2d] text-[#8fac8f] px-3 py-1 rounded-full">
+              Em busca do badge Flô #1
+            </span>
+          )}
+
+          {profile.is_fundador && (
+            <p className="text-[#8fac8f] text-xs mt-2">Membro Fundador</p>
           )}
 
           {profile.bio && (

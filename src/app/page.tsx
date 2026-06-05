@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { FORUM_CATEGORIAS } from '@/lib/constants'
+import { createClient } from '@/lib/supabase/server'
+import { FORUM_CATEGORIAS, FUNDADOR_LIMITE } from '@/lib/constants'
 
 function CtaButton({
   href,
@@ -23,7 +24,11 @@ function CtaButton({
   )
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient()
+  const { data: vagasRestantes } = await supabase.rpc('fundadores_restantes')
+  const vagas = typeof vagasRestantes === 'number' ? vagasRestantes : FUNDADOR_LIMITE
+
   return (
     <div className="min-h-screen bg-[#0d1a0d] text-[#e8f0e8]">
       {/* Header */}
@@ -42,9 +47,18 @@ export default function HomePage() {
       <main className="max-w-lg mx-auto px-4">
         {/* Hero */}
         <section className="pt-12 pb-16 text-center">
-          <span className="inline-block text-xs font-medium bg-[#1f351f] border border-[#4a7c4e] text-[#6aab6f] px-3 py-1 rounded-full mb-6">
+          <span className="inline-block text-xs font-medium bg-[#1f351f] border border-[#4a7c4e] text-[#6aab6f] px-3 py-1 rounded-full mb-2">
             🏆 Membros Fundadores — Badge Flô #1
           </span>
+          {vagas > 0 ? (
+            <p className="text-[#6aab6f] text-xs font-medium mb-6">
+              {vagas} de {FUNDADOR_LIMITE} vagas restantes
+            </p>
+          ) : (
+            <p className="text-[#8fac8f] text-xs mb-6">
+              Vagas de fundador esgotadas — cadastro aberto para todos
+            </p>
+          )}
 
           <h1 className="font-display text-4xl font-bold leading-tight mb-3">
             O diário do seu grow, do dia 1 à colheita
