@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale'
 import { AvancarFaseButton } from './AvancarFaseButton'
 import { TogglePublicoButton } from './TogglePublicoButton'
 import { AppShell } from '@/components/AppShell'
+import { PhotoGallery } from '@/components/PhotoGallery'
 
 const FASE_LABEL: Record<string, string> = {
   germinacao: 'Germinação',
@@ -220,19 +221,9 @@ export default async function CultivoPage({ params }: { params: Promise<{ id: st
             )}
 
             {registro.fotos && registro.fotos.length > 0 && (
-              <div className="flex gap-2 mt-3 overflow-x-auto">
-                {registro.fotos.map((path: string, i: number) => {
-                  const src = signedMap[path] ?? path
-                  return (
-                    <img
-                      key={i}
-                      src={src}
-                      alt=""
-                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                    />
-                  )
-                })}
-              </div>
+              <PhotoGallery
+                urls={registro.fotos.map((path: string) => signedMap[path] ?? path)}
+              />
             )}
           </div>
         ))}

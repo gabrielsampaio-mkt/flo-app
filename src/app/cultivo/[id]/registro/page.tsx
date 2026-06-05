@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, use } from 'react'
+import { useState, use, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+
+const MAX_FOTOS = 5
 
 const ESTADOS = [
   { value: 'saudavel', label: 'Saudável' },
@@ -44,9 +46,17 @@ export default function NovoRegistroPage({ params }: { params: Promise<Params> }
   const [horasLuz, setHorasLuz] = useState('')
   const [treinamento, setTreinamento] = useState<string[]>([])
   const [anotacao, setAnotacao] = useState('')
-  const [fotos, setFotos] = useState<File[]>([])
-  const [fotosPreviews, setFotosPreviews] = useState<string[]>([])
+  const [fotos, setFotos] = useState<{ file: File; preview: string }[]>([])
   const [uploadError, setUploadError] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fotosRef = useRef(fotos)
+  fotosRef.current = fotos
+
+  useEffect(() => {
+    return () => {
+      fotosRef.current.forEach(f => URL.revokeObjectURL(f.preview))
+    }
+  }, [])
 
   function toggleTreinamento(v: string) {
     setTreinamento(prev =>
@@ -57,10 +67,22 @@ export default function NovoRegistroPage({ params }: { params: Promise<Params> }
   function handleFotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
     if (files.length === 0) return
-    setFotos(prev => [...prev, ...files])
-    files.forEach(f => {
-      const url = URL.createObjectURL(f)
-      setFotosPreviews(prev => [...prev, url])
+
+    const disponivel = MAX_FOTOS - fotos.length
+    const novas = files.slice(0, disponivel).map(file => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }))
+
+    setFotos(prev => [...prev, ...novas])
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  function removeFoto(index: number) {
+    setFotos(prev => {
+      const removida = prev[index]
+      if (removida) URL.revokeObjectURL(removida.preview)
+      return prev.filter((_, i) => i !== index)
     })
   }
 
@@ -72,7 +94,7 @@ export default function NovoRegistroPage({ params }: { params: Promise<Params> }
 
       const fotosUrls: string[] = []
 
-      for (const foto of fotos) {
+      for (const { file: foto } of fotos) {
         const formData = new FormData()
         formData.append('foto', foto)
         formData.append('cultivoId', cultivoId)
@@ -270,29 +292,53 @@ export default function NovoRegistroPage({ params }: { params: Promise<Params> }
 
         {/* Fotos */}
         <div>
-          <label className="block text-[#8fac8f] text-sm mb-2">Fotos</label>
-          <label className="flex items-center justify-center w-full py-3 border border-dashed border-[#2d4a2d] rounded-xl cursor-pointer hover:border-[#4a7c4e] transition-colors">
-            <span className="text-[#8fac8f] text-sm">+ Adicionar foto</span>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFotoSelect}
-              className="hidden"
-            />
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[#8fac8f] text-sm">Fotos</label>
+            <span className="text-[#8fac8f] text-xs">
+              {fotos.length}/{MAX_FOTOS}
+            </span>
+          </div>
 
-          {fotosPreviews.length > 0 && (
-            <div className="flex gap-2 mt-3 overflow-x-auto">
-              {fotosPreviews.map((url, i) => (
-                <img
-                  key={i}
-                  src={url}
-                  alt=""
-                  className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                />
+          {fotos.length > 0 && (
+            <div className="flex gap-3 mt-1 mb-3 overflow-x-auto pb-1">
+              {fotos.map((foto, i) => (
+                <div key={foto.preview} className="relative flex-shrink-0">
+                  <img
+                    src={foto.preview}
+                    alt={`Foto ${i + 1}`}
+                    className="w-20 h-20 rounded-lg object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeFoto(i)}
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#c0392b] text-[#e8f0e8] text-xs font-bold flex items-center justify-center hover:bg-[#a93226] transition-colors shadow-sm"
+                    aria-label={`Remover foto ${i + 1}`}
+                  >
+                    ✕
+                  </button>
+                </div>
               ))}
             </div>
+          )}
+
+          {fotos.length < MAX_FOTOS && (
+            <label className="flex items-center justify-center w-full py-3 border border-dashed border-[#2d4a2d] rounded-xl cursor-pointer hover:border-[#4a7c4e] transition-colors">
+              <span className="text-[#8fac8f] text-sm">+ Adicionar foto</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFotoSelect}
+                className="hidden"
+              />
+            </label>
+          )}
+
+          {fotos.length > 0 && (
+            <p className="text-[#8fac8f] text-xs mt-2">
+              Toque no ✕ para remover antes de salvar.
+            </p>
           )}
 
           {uploadError && <p className="text-[#c0392b] text-sm mt-2">{uploadError}</p>}
